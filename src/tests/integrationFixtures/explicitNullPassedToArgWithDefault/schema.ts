@@ -15,8 +15,8 @@ export function getSchema(): GraphQLSchema {
                             defaultValue: "Hello"
                         }
                     },
-                    resolve(source, args) {
-                        return queryHelloResolver(source, args);
+                    resolve(source, args, ctx, info) {
+                        return ctx.readFromCacheOrEvaluate((source, args) => { return queryHelloResolver(source, args); });
                     }
                 }
             };

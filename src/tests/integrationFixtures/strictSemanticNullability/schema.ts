@@ -52,22 +52,22 @@ export function getSchema(): GraphQLSchema {
                 actuallyReturnsAsyncNull: {
                     name: "actuallyReturnsAsyncNull",
                     type: GraphQLString,
-                    resolve(source) {
-                        return assertNonNull(queryActuallyReturnsAsyncNullResolver(source));
+                    resolve(source, args, ctx, info) {
+                        return assertNonNull(ctx.readFromCacheOrEvaluate(source => { return queryActuallyReturnsAsyncNullResolver(source); }));
                     }
                 },
                 actuallyReturnsNull: {
                     name: "actuallyReturnsNull",
                     type: GraphQLString,
-                    resolve(source) {
-                        return assertNonNull(queryActuallyReturnsNullResolver(source));
+                    resolve(source, args, ctx, info) {
+                        return assertNonNull(ctx.readFromCacheOrEvaluate(source => { return queryActuallyReturnsNullResolver(source); }));
                     }
                 },
                 me: {
                     name: "me",
                     type: UserType,
-                    resolve(source) {
-                        return assertNonNull(queryMeResolver(source));
+                    resolve(source, args, ctx, info) {
+                        return assertNonNull(ctx.readFromCacheOrEvaluate(source => { return queryMeResolver(source); }));
                     }
                 }
             };
@@ -80,8 +80,8 @@ export function getSchema(): GraphQLSchema {
                 names: {
                     name: "names",
                     type: GraphQLString,
-                    subscribe(source) {
-                        return subscriptionNamesResolver(source);
+                    subscribe(source, args, ctx, info) {
+                        return ctx.readFromCacheOrEvaluate(source => { return subscriptionNamesResolver(source); });
                     },
                     resolve(payload) {
                         return assertNonNull(payload);

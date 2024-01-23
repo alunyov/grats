@@ -8,8 +8,8 @@ export function getSchema(): GraphQLSchema {
                 alwaysThrows: {
                     name: "alwaysThrows",
                     type: GraphQLString,
-                    resolve(source) {
-                        return queryAlwaysThrowsResolver(source);
+                    resolve(source, args, ctx, info) {
+                        return ctx.readFromCacheOrEvaluate(source => { return queryAlwaysThrowsResolver(source); });
                     }
                 }
             };

@@ -218,6 +218,12 @@ class Codegen {
     parentTypeName: string,
   ): ts.MethodDeclaration | null {
     const exported = fieldDirective(field, EXPORTED_DIRECTIVE);
+    // Case, where resolver defined as a standalone function
+    // #1 argument of the resolver is expected to be the parent type object
+    // #2 argument of the resolver is the list of user-provided arguments
+    // #3 `contextValue`
+    // #4 `info` - GraphQLResolveInfo
+    // #5 - something else?
     if (exported != null) {
       const exportedMetadata = parseExportedDirective(exported);
       const module = exportedMetadata.tsModulePath;
@@ -237,12 +243,13 @@ class Codegen {
 
       const usedArgs = RESOLVER_ARGS.slice(0, argCount);
 
-      return this.method(
-        methodName,
-        usedArgs.map((name) => {
-          return this.param(name);
-        }),
-        [
+      const innerResolverCall = F.createArrowFunction(
+        undefined,
+        undefined,
+        [],
+        undefined,
+        undefined,
+        F.createBlock([
           F.createReturnStatement(
             F.createCallExpression(
               F.createIdentifier(resolverName),
@@ -252,7 +259,32 @@ class Codegen {
               }),
             ),
           ),
-        ],
+        ]),
+      );
+
+      const returnStatement = F.createReturnStatement(
+        // call `ctx.readFromCacheOrEvaluate` method with the following arguments:
+        // args, info
+        F.createCallExpression(
+          F.createPropertyAccessExpression(
+            F.createIdentifier("ctx"),
+            F.createIdentifier("readFromCacheOrEvaluate"),
+          ),
+          undefined,
+          [
+            F.createIdentifier("args"),
+            F.createIdentifier("info"),
+            innerResolverCall,
+          ],
+        ),
+      );
+
+      return this.method(
+        methodName,
+        ["source", "args", "ctx", "info"].map((name) => {
+          return this.param(name);
+        }),
+        [returnStatement],
       );
     }
     const propertyName = fieldDirective(field, FIELD_NAME_DIRECTIVE);
@@ -285,7 +317,7 @@ class Codegen {
     return null;
   }
 
-  // If a field is smantically non-null, we need to wrap the resolver in a
+  // If a field is semantically non-null, we need to wrap the resolver in a
   // runtime check to ensure that the resolver does not return null.
   maybeApplySemanticNullRuntimeCheck(
     field: GraphQLField<unknown, unknown>,

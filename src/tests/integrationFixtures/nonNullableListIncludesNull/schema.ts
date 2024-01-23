@@ -9,15 +9,15 @@ export function getSchema(): GraphQLSchema {
                 someList: {
                     name: "someList",
                     type: new GraphQLList(new GraphQLNonNull(GraphQLString)),
-                    resolve(source) {
-                        return querySomeListResolver(source);
+                    resolve(source, args, ctx, info) {
+                        return ctx.readFromCacheOrEvaluate(source => { return querySomeListResolver(source); });
                     }
                 },
                 someListOfLists: {
                     name: "someListOfLists",
                     type: new GraphQLList(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString)))),
-                    resolve(source) {
-                        return querySomeListOfListsResolver(source);
+                    resolve(source, args, ctx, info) {
+                        return ctx.readFromCacheOrEvaluate(source => { return querySomeListOfListsResolver(source); });
                     }
                 }
             };
