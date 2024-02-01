@@ -1396,14 +1396,12 @@ class Extractor {
     const id = this.expectNameIdentifier(node.name);
     if (id == null) return null;
     let directives: ConstDirectiveNode[] = [];
-    if (id.text !== name.value) {
-      directives = [
-        this.gql.propertyNameDirective(node.name, {
-          name: id.text,
-          isMethod: isCallable(node),
-        }),
-      ];
-    }
+    directives = [
+      this.gql.propertyNameDirective(node.name, {
+        name: id.text,
+        isMethod: isCallable(node),
+      }),
+    ];
     if (isStream) {
       directives.push(this.gql.asyncIterableDirective(node.type));
     }
@@ -1446,7 +1444,7 @@ class Extractor {
         return { type: t, isStream: true };
       }
     }
-    const inner = this.maybeUnwrapPromise(node);
+    const inner = this.maybeUnwrapWrapper(node);
     if (inner == null) return null;
     const t = this.collectType(inner);
     if (t == null) return null;
@@ -1455,17 +1453,18 @@ class Extractor {
 
   collectPropertyType(node: ts.TypeNode): TypeNode | null {
     // TODO: Handle function types here.
-    const inner = this.maybeUnwrapPromise(node);
+    const inner = this.maybeUnwrapWrapper(node);
     if (inner == null) return null;
     return this.collectType(inner);
   }
 
-  maybeUnwrapPromise(node: ts.TypeNode): ts.TypeNode | null {
+  maybeUnwrapWrapper(node: ts.TypeNode): ts.TypeNode | null {
+    const supportedWrappers = new Set(["Promise", "Observable"]);
     if (ts.isTypeReferenceNode(node)) {
       const identifier = this.expectNameIdentifier(node.typeName);
       if (identifier == null) return null;
 
-      if (identifier.text === "Promise") {
+      if (supportedWrappers.has(identifier.text)) {
         if (node.typeArguments == null || node.typeArguments.length === 0) {
           return this.report(node, E.wrapperMissingTypeArg());
         }

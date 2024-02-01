@@ -267,11 +267,12 @@ class Codegen {
         // args, info
         F.createCallExpression(
           F.createPropertyAccessExpression(
-            F.createIdentifier("ctx"),
+            F.createIdentifier("context"),
             F.createIdentifier("readFromCacheOrEvaluate"),
           ),
           undefined,
           [
+            F.createIdentifier("source"),
             F.createIdentifier("args"),
             F.createIdentifier("info"),
             innerResolverCall,
@@ -281,7 +282,7 @@ class Codegen {
 
       return this.method(
         methodName,
-        ["source", "args", "ctx", "info"].map((name) => {
+        RESOLVER_ARGS.map((name) => {
           return this.param(name);
         }),
         [returnStatement],
@@ -295,22 +296,51 @@ class Codegen {
         F.createIdentifier(name),
       );
 
-      let valueExpression: ts.Expression = prop;
+      let returnStatement: ts.ReturnStatement;
 
       if (isMethod) {
-        valueExpression = F.createCallExpression(
+        const callExpression = F.createCallExpression(
           prop,
           undefined,
-          RESOLVER_ARGS.map((name) => {
+          ["args", "context", "info"].map((name) => {
             return F.createIdentifier(name);
           }),
         );
+
+        const innerResolverCall = F.createArrowFunction(
+          undefined,
+          undefined,
+          [],
+          undefined,
+          undefined,
+          F.createBlock([F.createReturnStatement(callExpression)]),
+        );
+
+        returnStatement = F.createReturnStatement(
+          // call `ctx.readFromCacheOrEvaluate` method with the following arguments:
+          // args, info
+          F.createCallExpression(
+            F.createPropertyAccessExpression(
+              F.createIdentifier("context"),
+              F.createIdentifier("readFromCacheOrEvaluate"),
+            ),
+            undefined,
+            [
+              F.createIdentifier("source"),
+              F.createIdentifier("args"),
+              F.createIdentifier("info"),
+              innerResolverCall,
+            ],
+          ),
+        );
+      } else {
+        returnStatement = F.createReturnStatement(prop);
       }
 
       return this.method(
         methodName,
         RESOLVER_ARGS.map((name) => this.param(name)),
-        [F.createReturnStatement(valueExpression)],
+        [returnStatement],
       );
     }
 

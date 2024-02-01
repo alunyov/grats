@@ -14,8 +14,8 @@ export function getSchema(): GraphQLSchema {
                             type: new GraphQLNonNull(GraphQLID)
                         }
                     },
-                    resolve(source, args, ctx, info) {
-                        return ctx.readFromCacheOrEvaluate((source, args) => { return queryHelloResolver(source, args); });
+                    resolve(source, args, context, info) {
+                        return context.readFromCacheOrEvaluate(args, info, () => { return queryHelloResolver(source, args); });
                     }
                 }
             };

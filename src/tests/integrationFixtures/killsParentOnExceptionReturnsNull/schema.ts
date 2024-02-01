@@ -19,8 +19,8 @@ export function getSchema(): GraphQLSchema {
                 me: {
                     name: "me",
                     type: UserType,
-                    resolve(source, args, ctx, info) {
-                        return ctx.readFromCacheOrEvaluate(source => { return queryMeResolver(source); });
+                    resolve(source, args, context, info) {
+                        return context.readFromCacheOrEvaluate(args, info, () => { return queryMeResolver(source); });
                     }
                 }
             };

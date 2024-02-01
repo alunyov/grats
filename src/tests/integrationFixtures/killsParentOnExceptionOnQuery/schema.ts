@@ -9,15 +9,15 @@ export function getSchema(): GraphQLSchema {
                 alwaysThrowsKillsParentOnException: {
                     name: "alwaysThrowsKillsParentOnException",
                     type: new GraphQLNonNull(GraphQLString),
-                    resolve(source, args, ctx, info) {
-                        return ctx.readFromCacheOrEvaluate(source => { return queryAlwaysThrowsKillsParentOnExceptionResolver(source); });
+                    resolve(source, args, context, info) {
+                        return context.readFromCacheOrEvaluate(args, info, () => { return queryAlwaysThrowsKillsParentOnExceptionResolver(source); });
                     }
                 },
                 hello: {
                     name: "hello",
                     type: GraphQLString,
-                    resolve(source, args, ctx, info) {
-                        return ctx.readFromCacheOrEvaluate(source => { return queryHelloResolver(source); });
+                    resolve(source, args, context, info) {
+                        return context.readFromCacheOrEvaluate(args, info, () => { return queryHelloResolver(source); });
                     }
                 }
             };

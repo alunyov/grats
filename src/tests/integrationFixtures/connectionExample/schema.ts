@@ -71,8 +71,8 @@ export function getSchema(): GraphQLSchema {
                             type: GraphQLInt
                         }
                     },
-                    resolve(source, args, ctx, info) {
-                        return ctx.readFromCacheOrEvaluate((source, args) => { return queryFirstHundredIntegersResolver(source, args); });
+                    resolve(source, args, context, info) {
+                        return context.readFromCacheOrEvaluate(args, info, () => { return queryFirstHundredIntegersResolver(source, args); });
                     }
                 }
             };
