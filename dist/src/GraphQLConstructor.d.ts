@@ -1,0 +1,45 @@
+import { ListTypeNode, NamedTypeNode, Location as GraphQLLocation, NameNode, Token, TypeNode, NonNullTypeNode, StringValueNode, ConstValueNode, ConstDirectiveNode, ConstArgumentNode, UnionTypeDefinitionNode, FieldDefinitionNode, InputValueDefinitionNode, FloatValueNode, IntValueNode, NullValueNode, BooleanValueNode, ConstListValueNode, ConstObjectValueNode, ConstObjectFieldNode, ObjectTypeDefinitionNode, EnumValueDefinitionNode, ScalarTypeDefinitionNode, InputObjectTypeDefinitionNode, EnumTypeDefinitionNode, InterfaceTypeDefinitionNode, DefinitionNode, Location, ASTNode } from "graphql";
+import * as ts from "typescript";
+import { ExportedMetadata, PropertyNameMetadata } from "./metadataDirectives";
+export type GratsDefinitionNode = DefinitionNode | AbstractFieldDefinitionNode;
+export type AbstractFieldDefinitionNode = {
+    readonly kind: "AbstractFieldDefinition";
+    readonly loc: Location;
+    readonly onType: NameNode;
+    readonly field: FieldDefinitionNode;
+};
+export declare class GraphQLConstructor {
+    exportedDirective(node: ts.Node, exported: ExportedMetadata): ConstDirectiveNode;
+    propertyNameDirective(node: ts.Node, propertyName: PropertyNameMetadata): ConstDirectiveNode;
+    asyncIterableDirective(node: ts.Node): ConstDirectiveNode;
+    killsParentOnExceptionDirective(node: ts.Node): ConstDirectiveNode;
+    unionTypeDefinition(node: ts.Node, name: NameNode, types: NamedTypeNode[], description: StringValueNode | null): UnionTypeDefinitionNode;
+    objectTypeDefinition(node: ts.Node, name: NameNode, fields: FieldDefinitionNode[], interfaces: NamedTypeNode[] | null, description: StringValueNode | null): ObjectTypeDefinitionNode;
+    interfaceTypeDefinition(node: ts.Node, name: NameNode, fields: FieldDefinitionNode[], interfaces: NamedTypeNode[] | null, description: StringValueNode | null): InterfaceTypeDefinitionNode;
+    enumTypeDefinition(node: ts.Node, name: NameNode, values: readonly EnumValueDefinitionNode[], description: StringValueNode | null): EnumTypeDefinitionNode;
+    abstractFieldDefinition(node: ts.Node, onType: NameNode, field: FieldDefinitionNode): AbstractFieldDefinitionNode;
+    fieldDefinition(node: ts.Node, name: NameNode, type: TypeNode, args: readonly InputValueDefinitionNode[] | null, directives: readonly ConstDirectiveNode[], description: StringValueNode | null): FieldDefinitionNode;
+    constObjectField(node: ts.Node, name: NameNode, value: ConstValueNode): ConstObjectFieldNode;
+    inputValueDefinition(node: ts.Node, name: NameNode, type: TypeNode, directives: readonly ConstDirectiveNode[] | null, defaultValue: ConstValueNode | null, description: StringValueNode | null): InputValueDefinitionNode;
+    enumValueDefinition(node: ts.Node, name: NameNode, directives: readonly ConstDirectiveNode[] | undefined, description: StringValueNode | null): EnumValueDefinitionNode;
+    scalarTypeDefinition(node: ts.Node, name: NameNode, description: StringValueNode | null): ScalarTypeDefinitionNode;
+    inputObjectTypeDefinition(node: ts.Node, name: NameNode, fields: InputValueDefinitionNode[] | null, directives: readonly ConstDirectiveNode[] | null, description: StringValueNode | null): InputObjectTypeDefinitionNode;
+    name(node: ts.Node, value: string): NameNode;
+    namedType(node: ts.Node, value: string): NamedTypeNode;
+    object(node: ts.Node, fields: ReadonlyArray<ConstObjectFieldNode>): ConstObjectValueNode;
+    nonNullType(node: ts.Node, type: TypeNode): NonNullTypeNode;
+    nullableType(type: TypeNode): NamedTypeNode | ListTypeNode;
+    listType(node: ts.Node, type: TypeNode): ListTypeNode;
+    list(node: ts.Node, values: ConstValueNode[]): ConstListValueNode;
+    withLocation<T = ASTNode>(node: ts.Node, value: T): T;
+    constArgument(node: ts.Node, name: NameNode, value: ConstValueNode): ConstArgumentNode;
+    constDirective(node: ts.Node, name: NameNode, args: ReadonlyArray<ConstArgumentNode> | null): ConstDirectiveNode;
+    string(node: ts.Node, value: string, block?: boolean): StringValueNode;
+    float(node: ts.Node, value: string): FloatValueNode;
+    int(node: ts.Node, value: string): IntValueNode;
+    null(node: ts.Node): NullValueNode;
+    boolean(node: ts.Node, value: boolean): BooleanValueNode;
+    _optionalList<T>(input: readonly T[] | null): readonly T[] | undefined;
+    _loc(node: ts.Node): GraphQLLocation;
+    _dummyToken(sourceFile: ts.SourceFile, pos: number): Token;
+}
